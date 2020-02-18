@@ -49,11 +49,16 @@ def format_data():
 
     #
     ref_scores = pd.read_pickle('data/processed/d_mapping_season_scores.pkl')
-    df = pd.merge(df, ref_scores[['season', 'teamid', 'avg_season_wscore']], how='left', left_on=['season', 'wteamid'],
-                  right_on=['season', 'teamid'], validate='m:1').drop(columns='teamid')
-    df = pd.merge(df, ref_scores[['season', 'teamid', 'avg_season_lscore']], how='left', left_on=['season', 'lteamid'],
-                  right_on=['season', 'teamid'], validate='m:1').drop(columns='teamid')
 
+    df_win = df[['season', 'daynum', 'wteamid', ]].copy().rename(columns={'wteamid': 'teamid'})
+    df_lose = df[['season', 'daynum', 'lteamid', ]].copy().rename(columns={'lteamid': 'teamid'})
+
+    # set kpi
+    df_win['kpi'] = 1
+    df_lose['kpi'] = 0
+
+    df = pd.concat([df_win, df_lose])
+    df['seed'] = 'season'
 
     return df
 

@@ -31,8 +31,16 @@ def format_tour(df):
 
     ref = pd.read_pickle('data/processed/d_mapping_tour_scores.pkl')
 
-    df_tour_win = df[['season', 'daynum', 'wteamid', 'lteamid']]
-    pd.merge(df_tour_win, ref, how='left', left_on='wteamid', right_on='teamid')
+
+    df_tour_win = df[['season', 'daynum', 'wteamid']].copy().rename(columns={'wteamid': 'teamid'})
+    df_tour_lose = df[['season', 'daynum', 'lteamid']].copy().rename(columns={'lteamid': 'teamid'})
+
+    # kpi
+    df_tour_win['kpi'] = 1
+    df_tour_lose['kpi'] = 0
+
+    # concat
+    df = pd.concat([df_tour_win, df_tour_lose])
 
     return df
 
@@ -44,7 +52,7 @@ def run():
     # Season results
     df_tour = clean_names(pd.read_pickle('data/imported/mncaatourneydetailedresults.pkl'))
 
-    process_tour_score(df_tour)
+    process_tour_score(df_tour.copy())
 
     format_tour(df_tour)
 
