@@ -32,8 +32,12 @@ def format_tour(df):
     ref = pd.read_pickle('data/processed/d_mapping_tour_scores.pkl')
 
 
-    df_tour_win = df[['season', 'daynum', 'wteamid']].copy().rename(columns={'wteamid': 'teamid'})
-    df_tour_lose = df[['season', 'daynum', 'lteamid']].copy().rename(columns={'lteamid': 'teamid'})
+    df_tour_win = df[['season', 'daynum', 'wteamid','lteamid' ]].copy()
+    df_tour_lose = df[['season', 'daynum', 'wteamid', 'lteamid']].copy()
+
+    #
+    df_tour_win['teamid'] = df_tour_win.wteamid
+    df_tour_lose['teamid'] = df_tour_lose.lteamid
 
     # kpi
     df_tour_win['kpi'] = 1
@@ -41,6 +45,20 @@ def format_tour(df):
 
     # concat
     df = pd.concat([df_tour_win, df_tour_lose])
+
+    # Merge seeds
+    ref_seeds = pd.read_pickle('data/imported/mncaatourneyseeds.pkl')
+    ref_seeds = clean_names(ref_seeds)
+
+    df = pd.merge(df, ref_seeds, how='left', left_on=['season', 'wteamid'], right_on=['season', 'teamid'], validate='m:1').rename(columns={'seed': 'wseed'})
+    df = pd.merge(df, ref_seeds, how='left', left_on=['season', 'lteamid'], right_on=['season', 'teamid'], validate='m:1').rename(columns={'seed': 'lseed'})
+
+    df['seed_winner'] = df['wseed'].apply(lambda x: x[1:3]).astype('int')
+    df['seed_loser'] = df['lseed'].apply(lambda x: x[1:3]).astype('int')
+
+    df['seed_difference'] = np.where(df.wteamid == df.teamid, df.seed_winner - df.seed_loser,
+                                     df.seed_loser - df.seed_winner)
+
 
     return df
 
@@ -54,7 +72,8 @@ def run():
 
     process_tour_score(df_tour.copy())
 
-    format_tour(df_tour)
+    df_tour = format_tour(df_tour)
+    pd.to_pickle(df_tour, 'data/processed/tour_features.pkl')
 
 
 

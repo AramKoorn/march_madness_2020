@@ -2,3 +2,10 @@ pandas==1.0.1
 numpy
 matplotlib
 seaborn==0.10.0
+tensorflow-gpu
+Cython
+contextlib2
+pillow
+lxml
+jupyter
+matplotlib
