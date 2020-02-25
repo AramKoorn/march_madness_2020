@@ -32,8 +32,8 @@ def format_tour(df):
     ref = pd.read_pickle('data/processed/d_mapping_tour_scores.pkl')
 
 
-    df_tour_win = df[['season', 'daynum', 'wteamid','lteamid' ]].copy()
-    df_tour_lose = df[['season', 'daynum', 'wteamid', 'lteamid']].copy()
+    df_tour_win = df[['season', 'daynum', 'wteamid','lteamid' , 'wscore', 'lscore']].copy()
+    df_tour_lose = df[['season', 'daynum', 'wteamid', 'lteamid', 'wscore', 'lscore']].copy()
 
     #
     df_tour_win['teamid'] = df_tour_win.wteamid
@@ -59,6 +59,8 @@ def format_tour(df):
     df['seed_difference'] = np.where(df.wteamid == df.teamid, df.seed_winner - df.seed_loser,
                                      df.seed_loser - df.seed_winner)
 
+
+    df['goal_difference'] = np.where(df.kpi == 1, df.wscore - df.lscore, df.lscore - df.wscore)
 
     return df
 

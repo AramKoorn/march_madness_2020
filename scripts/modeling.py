@@ -1,9 +1,14 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-import numpy as np
-import pandas as pd
-from IPython.display import clear_output
-from matplotlib import pyplot as plt
 import tensorflow as tf
-tf.random.set_random_seed(123)
-tf.estimator.BoostedTreesClassifier
+import pandas as pd
+from tensorflow import keras
+from tensorflow.keras import layers
+
+print(tf.__version__)
+
+
+
+def run():
+
+    df = pd.read_pickle('data/processed/tour_features.pkl')
+    X_train = df.seed_difference
+    y_train = df.goal_difference
